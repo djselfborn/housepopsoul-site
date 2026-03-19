@@ -1,4 +1,19 @@
-import { useState, useCallback } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOUSE·POP·SOUL</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+const { useState, useCallback } = React;
 
 /* 3 colors from the album cover + the title white */
 const TEAL = "#2a8a7a";
@@ -136,7 +151,7 @@ function Home({ setTab }) {
         <div className="hero-inner">
           <div className="hero-cover-col">
             <div className="cover-frame">
-              <img src="/api/files/HPS_COVER_IDEA_1.jpg" alt="HOUSE·POP·SOUL" className="cover"/>
+              <img src="HPS COVER IDEA 1.jpg" alt="HOUSE·POP·SOUL" className="cover"/>
             </div>
           </div>
           <div className="hero-text-col">
@@ -188,7 +203,7 @@ function Home({ setTab }) {
       <div className="back-sec">
         <div className="sec-hd"><span className="sec-ln"/><span className="sec-lb">FULL TRACKLIST</span><span className="sec-ln"/></div>
         <div className="back-frame">
-          <img src="/api/files/HPS_COVER_BACK.jpg" alt="Back Cover" className="back-img"/>
+          <img src="HPS COVER BACK.jpg" alt="Back Cover" className="back-img"/>
         </div>
       </div>
     </div>
@@ -301,7 +316,7 @@ function ListenPage({ setTab }) {
       <div className="sc-wrap">
         <iframe width="100%" height="400" scrolling="no" frameBorder="no" allow="autoplay"
           src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fon.soundcloud.com%2FXt1n8snbIhYeux3M9p&color=%232a8a7a&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true"
-          style={{borderRadius:0}}/>
+          style={{borderRadius:0}}></iframe>
       </div>
       <div className="sc-cta">
         <svg className="cta-bg" viewBox="0 0 600 120" preserveAspectRatio="none">
@@ -396,7 +411,7 @@ function Footer() {
   );
 }
 
-export default function App() {
+function App() {
   const [tab, setTab] = useState("home");
   const go = useCallback(t => { setTab(t); window.scrollTo?.({top:0,behavior:"smooth"}); },[]);
   return (
@@ -589,3 +604,9 @@ body{background:${BLACK};color:${CREAM};font-family:'Space Mono',monospace}
     </div>
   );
 }
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+    </script>
+</body>
+</html>
