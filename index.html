@@ -1,0 +1,591 @@
+import { useState, useCallback } from "react";
+
+/* 3 colors from the album cover + the title white */
+const TEAL = "#2a8a7a";
+const RUST = "#b8562a";
+const CREAM = "#e8dcc8";
+const TITLE_WHITE = "#f0e8d6"; /* the warm white from the album title */
+const BLACK = "#080806";
+
+const tracks = [
+  { num: 1, title: "Intro", feat: "", time: "0:14" },
+  { num: 2, title: "What You Want", feat: "Maya Azucena", time: "6:08" },
+  { num: 3, title: "One Night", feat: "Big Brooklyn Red", time: "6:49" },
+  { num: 4, title: "Sunflower Seeds", feat: "", time: "5:39" },
+  { num: 5, title: "You", feat: "Maya Azucena & Mental Growth of Basic Vocab", time: "4:09" },
+  { num: 6, title: "We Are Everyone", feat: "Big Brooklyn Red", time: "6:33" },
+  { num: 7, title: "Computerism", feat: "Jean Caze", time: "5:35", note: "Dedicated to Ronald Davis" },
+  { num: 8, title: "Interlude", feat: "", time: "0:15" },
+  { num: 9, title: "Read A Book", feat: "Maya Azucena", time: "5:14" },
+  { num: 10, title: "The Shelter", feat: "", time: "5:16" },
+  { num: 11, title: "Wait Too Long", feat: "Maya Azucena", time: "5:39" },
+  { num: 12, title: "World To Change", feat: "Big Brooklyn Red", time: "5:45" },
+  { num: 13, title: "Break It Up", feat: "Maya Azucena", time: "6:15" },
+  { num: 14, title: "House Heads", feat: "Olskool Ice-Gre of Abstract Mindstate", time: "5:14" },
+  { num: 15, title: "When Doves Cry", feat: "Big Brooklyn Red", time: "6:10" },
+  { num: 16, title: "Outro", feat: "", time: "0:14" },
+];
+
+const ZAZZLE = "https://www.zazzle.com/house_pop_soul_t_shirt_tri_blend_shirt-256160461872347038";
+
+const bios = {
+  selfborn: {
+    name: "DJ SELF BORN", role: "PRODUCER & ARRANGER",
+    bio: `Born and raised on the South Side of Chicago — the birthplace of house music — DJ Self Born grew up in a home where music was the heartbeat of every room. His father wired speakers throughout the house, and the radio was the family's morning coffee.\n\nAs a touring DJ and producer, Self Born has shared stages with Jay-Z & Roc-A-Fella, 50 Cent & G-Unit, and Wu-Tang Clan. He served as Tour DJ/Host for Raekwon the Chef coast-to-coast and has been the go-to DJ for private events with Gabrielle Union, Dwayne Wade, and Warren Sapp.\n\nSelf Born worked alongside Kanye West to produce Abstract Mindstate. He provided all the scratches on their album "Dreams Still Inspire," produced by Kanye West and released on YZY SND in 2021.\n\nHis solo discography includes "Heaven Is A Studio, God Is A DJ," "Bigger Than Rap Music," "Rich Plug, Poor Plug," "The Sky-Cave Kid Superhero Adventures," and "I'm Not O.C.D., Everything Just Has To Be Perfect."\n\nWith HOUSE·POP·SOUL, Self Born channels his deep Chicago roots and New York connections into a genre-defying masterpiece.`,
+    links: { INSTAGRAM: "https://www.instagram.com/djselfborn/", FACEBOOK: "https://www.facebook.com/rich.blackman.507" },
+  },
+  maya: {
+    name: "MAYA AZUCENA", role: "VOCALIST & SONGWRITER",
+    bio: `Brooklyn-born and globally celebrated, Maya Azucena is a force of nature with a four-octave vocal range bridging soul, hip-hop, rock, jazz, reggae, and electronic music. Billboard Magazine calls her vocals "soaring" and BuzzFeed hails her as "a musical revolution."\n\nA graduate of LaGuardia High School of Performing Arts, Maya released her debut "Maya Who?!" in 2003 — a critically acclaimed soul record that became an underground favorite. Her follow-up "Junkyard Jewel" (2007) earned nominations for Best Female Vocalist and Album of the Year at the SoulTracks Awards. Her song "Down, Down" was featured on HBO's The Wire.\n\nMaya appears on Stephen Marley's Grammy-winning debut "Mind Control," earned two Croatian Grammy Awards for her work with Gibonni, and has recorded with Immortal Technique, DJ Spinna, Large Professor, Cormega, Redman, Marcus Miller, and Vernon Reid of Living Colour.\n\nAs a U.S. Cultural Ambassador, she has completed over twelve humanitarian tours in 40+ countries. She was invited to the White House to celebrate the Global Cultural Initiative.\n\nOn HOUSE·POP·SOUL, Maya brings her signature blend of power, warmth, and social consciousness.`,
+    links: { WEBSITE: "https://mayaazucena.com" },
+  },
+  bbr: {
+    name: "BIG BROOKLYN RED", role: "VOCALIST & IMPROVISER",
+    bio: `Big Brooklyn Red is a singular voice in modern soul — a performer whose live shows are part concert, part spiritual experience. He describes his performances as "a place of worship," communicating in what he calls "the Mother Tongue."\n\nA Brooklyn native, Red started his first band "Eli & the Bluesound Project" in 1994. He later worked with Luther Vandross's drummer Ivan Hampden and vocalist Paulette McWilliams — a master class that made his talent razor-sharp.\n\nIn 1997, Red moved to Miami and within six months became the premier soul singer in South Florida. During the 2001-02 NBA season, he and the Miami Funk All Stars were the house band for the Miami Heat. In 2003, he became a "Showtime at the Apollo" Champion.\n\nHis creative process is legendary — he rarely writes traditionally. He listens to a track, opens his mouth, and lets it pour out in a single "Golden Take." People have spotted him walking down the street chanting lyrics until he can find a pen and napkin.\n\nOn HOUSE·POP·SOUL, Big Brooklyn Red brings that raw, channeled energy to house music — pure, unfiltered soul.`,
+    links: { SPOTIFY: "https://open.spotify.com/artist/3ky0XV2gIex3GUkNSXdRD8" },
+  },
+  jean: {
+    name: "JEAN CAZE", role: "TRUMPET & FLUGELHORN",
+    bio: `Haitian-American trumpet virtuoso Jean Caze is one of contemporary jazz's most captivating voices. Growing up in Queens, he picked up the trumpet at age nine.\n\nHis journey spans the Juilliard MAP Program, Manhattan School of Music, and Florida International University. He won the 2004 National Trumpet Jazz Competition, the 2006 International Trumpet Guild Jazz Competition, and placed second in the 2007 Thelonious Monk International Jazz Trumpet Competition.\n\nJean has performed with Herbie Hancock, Aretha Franklin, Michael Bublé (featured soloist in his touring band), Mariah Carey, Arturo Sandoval, Al Jarreau, George Duke, and Roy Hargrove. In high school, he performed live on NBC with the rock group Chicago.\n\nThe New York Times praised his playing as "strong and unexpectedly diverse." His albums "Miami Jazz Scene" and "Amédé" blend his Haitian heritage with American jazz.\n\nOn HOUSE·POP·SOUL, Jean lends his trumpet to "Computerism" — dedicated to Ronald Davis — infusing the album with jazz sophistication and Caribbean soul.`,
+    links: { WEBSITE: "https://www.jeancaze.com" },
+  },
+  icegre: {
+    name: "OLSKOOL ICE-GRE", role: "MC / ABSTRACT MINDSTATE",
+    bio: `Greg "Olskool Ice-Gre" Lewis is one half of Abstract Mindstate, the legendary Chicago hip-hop duo formed with E.P. Da Hellcat at Jackson State University in 1993. They became key players in Chicago's conscious rap scene alongside Common and a young Kanye West.\n\nIce-Gre served as the first A&R of G.O.O.D. Music and later helped A&R "Ye" and "Kids See Ghosts," traveling to Japan and China with Kanye and Kid Cudi. Abstract Mindstate's comeback album "Dreams Still Inspire" (2021), fully produced by West, became YZY SND's debut release.\n\nAbstract Mindstate describes their sound as "Adult Contemporary Hip-Hop" — a term Ice-Gre coined. In 2025 they released "The Art Project" produced by Young RJ of Slum Village. Their single "Bar Louie" won a Hollywood Independent Music Award.\n\nIce-Gre co-founded G2 Productions with DJ Self Born — the production company behind HOUSE·POP·SOUL. On this album, he brings lyrical precision to "House Heads," connecting Chicago's hip-hop and house music roots.`,
+    links: { WEBSITE: "http://www.abstractmindstate.com" },
+  },
+  mentalgrowth: {
+    name: "MENTAL GROWTH", role: "MC / BASIC VOCAB",
+    bio: `Mental Growth is one of the lyrical architects behind Basic Vocab, the Miami-based hip-hop group proving the 305 has far more to offer than bass music. Alongside MC JL Sorrell and platinum-selling producer Tony Galvin (Trick Daddy, Trina, T.I.), Basic Vocab carved a lane for thoughtful, content-driven hip-hop.\n\nTheir 2006 debut "The General Dynamic" landed a single on HBO's Entourage and another on Miami Ink. Their 2010 follow-up "A Better Way" expanded on that vision with 21 tracks of versatile hip-hop. HipHopDX praised it as "underground worth listening to."\n\nMental Growth's approach is cerebral yet accessible — social commentary and personal reflection with golden-age flow. His collaboration with Maya Azucena on "You" bridges Miami's hip-hop underground with Chicago's house music DNA.`,
+    links: {},
+  },
+};
+
+const artistOrder = ["selfborn","maya","bbr","jean","icegre","mentalgrowth"];
+
+/* Cubist geometric SVG shapes — extending the album cover's visual language */
+function CubistDeco({ side = "left", color = TEAL }) {
+  if (side === "left") return (
+    <svg viewBox="0 0 120 200" className="deco deco-l" style={{color}}>
+      <polygon points="0,0 120,40 80,120 0,100" fill="currentColor" opacity=".12"/>
+      <polygon points="20,100 120,80 120,200 0,200" fill={RUST} opacity=".08"/>
+      <line x1="0" y1="60" x2="120" y2="90" stroke="currentColor" strokeWidth="2" opacity=".2"/>
+    </svg>
+  );
+  return (
+    <svg viewBox="0 0 120 200" className="deco deco-r" style={{color}}>
+      <polygon points="120,0 0,50 40,140 120,110" fill="currentColor" opacity=".12"/>
+      <polygon points="100,110 0,130 0,200 120,200" fill={RUST} opacity=".08"/>
+      <line x1="120" y1="70" x2="0" y2="100" stroke="currentColor" strokeWidth="2" opacity=".2"/>
+    </svg>
+  );
+}
+
+/* Geometric divider inspired by cover triangles */
+function GeoDivider() {
+  return (
+    <div className="geo-div">
+      <svg viewBox="0 0 600 20" preserveAspectRatio="none" className="geo-svg">
+        <polygon points="0,20 30,0 60,20" fill={TEAL} opacity=".5"/>
+        <polygon points="60,20 90,0 120,20" fill={RUST} opacity=".5"/>
+        <polygon points="120,20 150,0 180,20" fill={TEAL} opacity=".3"/>
+        <polygon points="180,20 210,0 240,20" fill={RUST} opacity=".3"/>
+        <polygon points="240,20 270,0 300,20" fill={TEAL} opacity=".5"/>
+        <polygon points="300,20 330,0 360,20" fill={RUST} opacity=".5"/>
+        <polygon points="360,20 390,0 420,20" fill={TEAL} opacity=".3"/>
+        <polygon points="420,20 450,0 480,20" fill={RUST} opacity=".3"/>
+        <polygon points="480,20 510,0 540,20" fill={TEAL} opacity=".5"/>
+        <polygon points="540,20 570,0 600,20" fill={RUST} opacity=".5"/>
+      </svg>
+    </div>
+  );
+}
+
+function Header({ tab, setTab }) {
+  const tabs = ["home","artists","tracklist","listen","shop"];
+  return (
+    <header className="hdr">
+      <div className="hdr-inner">
+        <div className="hdr-logo" onClick={() => setTab("home")}>
+          <span className="hdr-h">HOUSE</span>
+          <span className="hdr-dot">·</span>
+          <span className="hdr-h">POP</span>
+          <span className="hdr-dot">·</span>
+          <span className="hdr-h">SOUL</span>
+        </div>
+        <nav className="hdr-nav">
+          {tabs.map(t => (
+            <button key={t} className={`hdr-tab ${tab===t?"hdr-on":""}`} onClick={() => setTab(t)}>
+              {t.toUpperCase()}
+            </button>
+          ))}
+        </nav>
+      </div>
+      <div className="hdr-stripe"/>
+    </header>
+  );
+}
+
+function Home({ setTab }) {
+  return (
+    <div className="page-in">
+      {/* Hero */}
+      <div className="hero">
+        <CubistDeco side="left" color={TEAL}/>
+        <CubistDeco side="right" color={RUST}/>
+        <div className="hero-inner">
+          <div className="hero-cover-col">
+            <div className="cover-frame">
+              <img src="/api/files/HPS_COVER_IDEA_1.jpg" alt="HOUSE·POP·SOUL" className="cover"/>
+            </div>
+          </div>
+          <div className="hero-text-col">
+            <p className="hero-pre">SELF BORN MUSIC & G2 PRODUCTIONS</p>
+            <h1 className="hero-title">HOUSE<span className="dot-r">·</span>POP<span className="dot-t">·</span>SOUL</h1>
+            <p className="hero-tag">FROM CHICAGO TO NEW YORK WITH LOVE!</p>
+            <div className="hero-dash"/>
+            <p className="hero-body">
+              16 tracks. Chicago house meets New York soul meets conscious hip-hop. 
+              Produced & arranged by <span className="hl-r">DJ Self Born</span>. 
+              Featuring <span className="hl-t">Maya Azucena</span>, <span className="hl-r">Big Brooklyn Red</span>, 
+              <span className="hl-t"> Jean Caze</span>, <span className="hl-r">Olskool Ice-Gre</span> of 
+              Abstract Mindstate & <span className="hl-t">Mental Growth</span> of Basic Vocab.
+            </p>
+            <div className="hero-btns">
+              <button className="btn-fill-r" onClick={() => setTab("shop")}>BUY NOW</button>
+              <button className="btn-bdr-t" onClick={() => setTab("listen")}>PREVIEW</button>
+            </div>
+            <div className="hero-stats">
+              <div className="hs"><span className="hs-n">16</span><span className="hs-l">TRACKS</span></div>
+              <div className="hs"><span className="hs-n">6</span><span className="hs-l">ARTISTS</span></div>
+              <div className="hs"><span className="hs-n">79:29</span><span className="hs-l">RUNTIME</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <GeoDivider/>
+
+      {/* Marquee */}
+      <div className="marq">
+        <div className="marq-inner">
+          {[1,2].map(n => (
+            <span key={n} className="marq-content">
+              {artistOrder.map(k => (
+                <span key={k+n}>
+                  <button className="marq-name" onClick={() => setTab("artists")}>{bios[k].name}</button>
+                  <span className="marq-dot"> ◆ </span>
+                </span>
+              ))}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <GeoDivider/>
+
+      {/* Back cover */}
+      <div className="back-sec">
+        <div className="sec-hd"><span className="sec-ln"/><span className="sec-lb">FULL TRACKLIST</span><span className="sec-ln"/></div>
+        <div className="back-frame">
+          <img src="/api/files/HPS_COVER_BACK.jpg" alt="Back Cover" className="back-img"/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Artists() {
+  const [sel, setSel] = useState(null);
+
+  if (sel) {
+    const a = bios[sel];
+    return (
+      <div className="page-in" style={{maxWidth:800,margin:"0 auto",padding:"32px 20px 60px"}}>
+        <button className="go-back" onClick={() => setSel(null)}>← BACK</button>
+        <div className="bio-card">
+          <div className="bio-accent"/>
+          <div className="bio-head">
+            <h2 className="bio-name">{a.name}</h2>
+            <p className="bio-role">{a.role}</p>
+          </div>
+          <div className="bio-body">
+            {a.bio.split('\n\n').map((p,i) => <p key={i} className="bio-p">{p}</p>)}
+          </div>
+          <div className="bio-foot">
+            <p className="bio-fl">APPEARS ON HOUSE·POP·SOUL:</p>
+            <div className="bio-tags">
+              {tracks.filter(t => {
+                if (sel==='selfborn') return true;
+                if (sel==='maya') return t.feat.includes('Maya');
+                if (sel==='bbr') return t.feat.includes('Big Brooklyn');
+                if (sel==='jean') return t.feat.includes('Jean Caze');
+                if (sel==='icegre') return t.feat.includes('Olskool');
+                if (sel==='mentalgrowth') return t.feat.includes('Mental Growth');
+                return false;
+              }).slice(0,sel==='selfborn'?4:20).map((t,i) => (
+                <span key={i} className="bio-tag">{t.num}. {t.title}</span>
+              ))}
+              {sel==='selfborn' && <span className="bio-tag">+ ALL 16 (PRODUCER)</span>}
+            </div>
+            {Object.keys(a.links).length > 0 && (
+              <div className="bio-links">
+                {Object.entries(a.links).map(([k,u]) => (
+                  <a key={k} href={u} target="_blank" rel="noopener noreferrer" className="bio-link">{k} →</a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page-in" style={{maxWidth:1060,margin:"0 auto",padding:"32px 20px 60px"}}>
+      <div className="sec-hd"><span className="sec-ln"/><span className="sec-lb">THE ARTISTS</span><span className="sec-ln"/></div>
+      <div className="art-grid">
+        {artistOrder.map((k,i) => {
+          const a = bios[k];
+          return (
+            <button key={k} className="art-card" onClick={() => setSel(k)} style={{animationDelay:`${i*0.06}s`}}>
+              <div className={`art-bar ${i%2===0?"art-bar-t":"art-bar-r"}`}/>
+              <div className="art-inner">
+                <h3 className="art-name">{a.name}</h3>
+                <p className="art-role">{a.role}</p>
+                <p className="art-snip">{a.bio.substring(0,90)}...</p>
+                <span className="art-go">READ BIO →</span>
+              </div>
+              {/* Cubist corner triangle */}
+              <svg className="art-tri" viewBox="0 0 40 40">
+                <polygon points="40,0 40,40 0,40" fill={i%2===0?TEAL:RUST} opacity=".15"/>
+              </svg>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function TracklistPage() {
+  const [hov, setHov] = useState(-1);
+  return (
+    <div className="page-in" style={{maxWidth:800,margin:"0 auto",padding:"32px 20px 60px"}}>
+      <div className="sec-hd"><span className="sec-ln"/><span className="sec-lb">TRACKLIST</span><span className="sec-ln"/></div>
+      <div className="tl">
+        {tracks.map((t,i) => (
+          <div key={i} className={`tl-row ${hov===i?"tl-hi":""}`}
+            onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(-1)}>
+            <span className="tl-n">{String(t.num).padStart(2,'0')}</span>
+            <div className="tl-mid">
+              <span className="tl-t">{t.title}</span>
+              {t.feat && <span className="tl-f">ft. {t.feat}</span>}
+              {t.note && <span className="tl-nt">[{t.note}]</span>}
+            </div>
+            <span className="tl-tm">{t.time}</span>
+            <div className="tl-bar" style={{width:hov===i?"100%":"0%",background:i%2===0?TEAL:RUST}}/>
+          </div>
+        ))}
+      </div>
+      <p className="tl-cred">ALL TRACKS PRODUCED & ARRANGED BY DJ SELF BORN</p>
+      <p className="tl-copy">© SELF BORN MUSIC & G2 PRODUCTIONS</p>
+    </div>
+  );
+}
+
+function ListenPage({ setTab }) {
+  return (
+    <div className="page-in" style={{maxWidth:800,margin:"0 auto",padding:"32px 20px 60px"}}>
+      <div className="sec-hd"><span className="sec-ln"/><span className="sec-lb">PREVIEW</span><span className="sec-ln"/></div>
+      <div className="sc-wrap">
+        <iframe width="100%" height="400" scrolling="no" frameBorder="no" allow="autoplay"
+          src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fon.soundcloud.com%2FXt1n8snbIhYeux3M9p&color=%232a8a7a&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+          style={{borderRadius:0}}/>
+      </div>
+      <div className="sc-cta">
+        <svg className="cta-bg" viewBox="0 0 600 120" preserveAspectRatio="none">
+          <polygon points="0,0 200,120 0,120" fill={TEAL} opacity=".06"/>
+          <polygon points="600,0 400,120 600,120" fill={RUST} opacity=".06"/>
+        </svg>
+        <p className="sc-h">WANT THE FULL EXPERIENCE?</p>
+        <p className="sc-p">Support independent music. Grab the album on vinyl, CD, tape, or digital.</p>
+        <button className="btn-fill-r" onClick={() => setTab("shop")} style={{marginTop:14}}>GO TO SHOP →</button>
+      </div>
+      <div style={{marginTop:36}}>
+        <p className="pill-hd">STREAMING ON</p>
+        <div className="pills">
+          {["SPOTIFY","APPLE MUSIC","AMAZON","YOUTUBE","TIDAL","BANDCAMP","SOUNDCLOUD"].map(n => (
+            <a key={n} href="#" className="pill">{n}</a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ShopPage() {
+  const fmts = [
+    { name: "VINYL LP", icon: "💿", desc: "180G HEAVYWEIGHT · GATEFOLD SLEEVE" },
+    { name: "COMPACT DISC", icon: "📀", desc: "JEWEL CASE · FULL BOOKLET" },
+    { name: "CASSETTE", icon: "📼", desc: "LIMITED EDITION · CHROME TAPE" },
+    { name: "DIGITAL", icon: "⬇", desc: "MP3 & LOSSLESS FLAC" },
+  ];
+  return (
+    <div className="page-in" style={{maxWidth:980,margin:"0 auto",padding:"32px 20px 60px"}}>
+      <div className="sec-hd"><span className="sec-ln"/><span className="sec-lb">GET THE ALBUM</span><span className="sec-ln"/></div>
+      <div className="shop-grid">
+        {fmts.map((f,i) => (
+          <div key={i} className="shop-card">
+            <div className={`shop-top ${i%2===0?"shop-top-t":"shop-top-r"}`}>
+              <span className="shop-icon">{f.icon}</span>
+            </div>
+            <h3 className="shop-name">{f.name}</h3>
+            <p className="shop-desc">{f.desc}</p>
+            <a href="#" className={`shop-btn ${i%2===0?"shop-btn-t":"shop-btn-r"}`}>BUY</a>
+          </div>
+        ))}
+      </div>
+
+      {/* MERCH with direct Zazzle link */}
+      <div className="merch-sec">
+        <div className="sec-hd" style={{marginBottom:20}}><span className="sec-ln"/><span className="sec-lb">OFFICIAL MERCH</span><span className="sec-ln"/></div>
+        <div className="merch-box">
+          <svg className="merch-bg" viewBox="0 0 700 180" preserveAspectRatio="none">
+            <polygon points="0,0 140,180 0,180" fill={TEAL} opacity=".08"/>
+            <polygon points="700,0 560,180 700,180" fill={RUST} opacity=".08"/>
+          </svg>
+          <div className="merch-inner">
+            <div className="merch-vis">
+              <div className="merch-tee">
+                <span className="tee-t">HOUSE·POP·SOUL</span>
+                <span className="tee-s">OFFICIAL TEE</span>
+              </div>
+            </div>
+            <div className="merch-info">
+              <h4 className="merch-h">HOUSE·POP·SOUL T-SHIRT</h4>
+              <p className="merch-p">THE OFFICIAL ALBUM TEE — TRI-BLEND SHIRT<br/>REP THE MOVEMENT FROM MIAMI TO CHICAGO</p>
+              <a href={ZAZZLE} target="_blank" rel="noopener noreferrer" className="btn-fill-r">SHOP ON ZAZZLE →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{marginTop:36}}>
+        <p className="pill-hd">STREAM EVERYWHERE</p>
+        <div className="pills">
+          {["SPOTIFY","APPLE MUSIC","AMAZON","YOUTUBE","TIDAL","BANDCAMP","SOUNDCLOUD"].map(n => (
+            <a key={n} href="#" className="pill">{n}</a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="ftr">
+      <GeoDivider/>
+      <div className="ftr-inner">
+        <p className="ftr-title">HOUSE<span className="ftr-d1">·</span>POP<span className="ftr-d2">·</span>SOUL</p>
+        <p className="ftr-sub">© {new Date().getFullYear()} SELF BORN MUSIC & G2 PRODUCTIONS</p>
+        <p className="ftr-url">HOUSEPOPSOUL.COM</p>
+      </div>
+    </footer>
+  );
+}
+
+export default function App() {
+  const [tab, setTab] = useState("home");
+  const go = useCallback(t => { setTab(t); window.scrollTo?.({top:0,behavior:"smooth"}); },[]);
+  return (
+    <div>
+      <style>{`
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:${BLACK};color:${CREAM};font-family:'Space Mono',monospace}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cardSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scrollMarq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.page-in{animation:fadeUp .4s ease both}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:100;background:${BLACK}}
+.hdr-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px}
+.hdr-logo{cursor:pointer;display:flex;align-items:baseline;gap:0}
+.hdr-h{font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;color:${TITLE_WHITE};letter-spacing:3px}
+.hdr-dot{font-family:'Oswald',sans-serif;font-size:18px;color:${RUST};margin:0 2px}
+.hdr-stripe{height:3px;background:linear-gradient(90deg,${TEAL} 0%,${TEAL} 50%,${RUST} 50%,${RUST} 100%)}
+.hdr-nav{display:flex;gap:2px}
+.hdr-tab{background:none;border:2px solid transparent;color:${CREAM}66;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.hdr-tab:hover{color:${CREAM};border-color:${CREAM}18}
+.hdr-on{color:${TEAL}!important;border-color:${TEAL}!important;background:${TEAL}0a}
+
+/* HERO */
+.hero{position:relative;max-width:1200px;margin:0 auto;padding:40px 20px;overflow:hidden}
+.deco{position:absolute;top:0;width:120px;height:200px;pointer-events:none;opacity:.7}
+.deco-l{left:0}.deco-r{right:0}
+.hero-inner{display:grid;grid-template-columns:minmax(250px,400px) 1fr;gap:44px;align-items:center;position:relative;z-index:1}
+.cover-frame{border:3px solid ${CREAM}22;position:relative;overflow:hidden}
+.cover-frame::after{content:'';position:absolute;bottom:0;right:0;border:20px solid transparent;border-bottom-color:${TEAL};border-right-color:${TEAL};opacity:.25}
+.cover{width:100%;display:block}
+.hero-pre{font-size:10px;color:${TEAL};letter-spacing:3px;margin-bottom:10px}
+.hero-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(44px,6vw,82px);line-height:.92;letter-spacing:3px;color:${TITLE_WHITE};margin-bottom:4px}
+.dot-r{color:${RUST}}.dot-t{color:${TEAL}}
+.hero-tag{font-size:clamp(10px,1.3vw,13px);color:${RUST};letter-spacing:2px;margin-bottom:16px}
+.hero-dash{width:80px;height:3px;background:${TEAL};margin-bottom:16px}
+.hero-body{font-size:11px;color:${CREAM}88;line-height:2.1;margin-bottom:20px;max-width:440px}
+.hl-t{color:${TEAL};font-weight:700}.hl-r{color:${RUST};font-weight:700}
+.hero-btns{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+.btn-fill-r{background:${RUST};color:${CREAM};border:none;padding:11px 26px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;cursor:pointer;transition:all .2s}
+.btn-fill-r:hover{background:${CREAM};color:${RUST}}
+.btn-bdr-t{background:none;border:2px solid ${TEAL};color:${TEAL};padding:9px 26px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;cursor:pointer;transition:all .2s}
+.btn-bdr-t:hover{background:${TEAL};color:${BLACK}}
+.hero-stats{display:flex;gap:26px;padding-top:14px;border-top:1px solid ${CREAM}12}
+.hs-n{font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;color:${TITLE_WHITE};display:block;line-height:1}
+.hs-l{font-size:9px;color:${TEAL};letter-spacing:2px}
+
+/* GEO DIVIDER */
+.geo-div{width:100%;overflow:hidden;height:20px}
+.geo-svg{width:100%;height:20px}
+
+/* MARQUEE */
+.marq{background:${TEAL};overflow:hidden;padding:9px 0}
+.marq-inner{display:flex;white-space:nowrap;animation:scrollMarq 20s linear infinite;width:max-content}
+.marq-content{display:flex;align-items:center}
+.marq-name{background:none;border:none;color:${BLACK};font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:color .15s}
+.marq-name:hover{color:${CREAM}}
+.marq-dot{color:${BLACK}55;font-size:8px;margin:0 12px}
+
+/* SECTIONS */
+.sec-hd{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.sec-ln{flex:1;height:1px;background:${CREAM}18}
+.sec-lb{font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;letter-spacing:5px;color:${TITLE_WHITE};white-space:nowrap}
+
+/* BACK COVER */
+.back-sec{max-width:640px;margin:36px auto 0;padding:0 20px}
+.back-frame{border:3px solid ${RUST}55;position:relative}
+.back-frame::before{content:'';position:absolute;top:0;left:0;border:16px solid transparent;border-top-color:${TEAL};border-left-color:${TEAL};opacity:.2;z-index:1}
+.back-img{width:100%;display:block}
+
+/* ARTIST GRID */
+.art-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.art-card{background:${BLACK};border:2px solid ${CREAM}10;text-align:left;padding:0;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;animation:cardSlide .4s ease both;width:100%}
+.art-card:hover{border-color:${TEAL};transform:translateY(-2px)}
+.art-bar{height:3px;width:100%}
+.art-bar-t{background:${TEAL}}.art-bar-r{background:${RUST}}
+.art-inner{padding:16px 18px 18px}
+.art-name{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;color:${TITLE_WHITE};margin-bottom:3px}
+.art-role{font-size:9px;color:${TEAL};letter-spacing:2px;margin-bottom:10px}
+.art-snip{font-size:10px;color:${CREAM}44;line-height:1.7;margin-bottom:10px}
+.art-go{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;color:${RUST};letter-spacing:2px}
+.art-tri{position:absolute;bottom:0;right:0;width:40px;height:40px}
+
+/* BIO */
+.go-back{background:none;border:none;color:${TEAL};font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;cursor:pointer;margin-bottom:16px;padding:0}
+.go-back:hover{color:${CREAM}}
+.bio-card{border:2px solid ${CREAM}14;background:${BLACK};overflow:hidden}
+.bio-accent{height:4px;background:linear-gradient(90deg,${TEAL},${RUST})}
+.bio-head{padding:22px 26px 16px;border-bottom:2px solid ${CREAM}0c}
+.bio-name{font-family:'Oswald',sans-serif;font-size:34px;font-weight:700;letter-spacing:3px;color:${TITLE_WHITE}}
+.bio-role{font-size:10px;color:${RUST};letter-spacing:2px;margin-top:4px}
+.bio-body{padding:22px 26px}
+.bio-p{font-size:11px;color:${CREAM}99;line-height:2.1;margin-bottom:12px}
+.bio-foot{padding:18px 26px 22px;border-top:1px solid ${CREAM}0c}
+.bio-fl{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;color:${TEAL};letter-spacing:2px;margin-bottom:8px}
+.bio-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.bio-tag{border:1px solid ${TEAL}33;padding:3px 9px;font-size:9px;color:${TEAL};letter-spacing:1px}
+.bio-links{display:flex;gap:8px}
+.bio-link{border:1px solid ${RUST}44;padding:5px 14px;text-decoration:none;font-family:'Oswald',sans-serif;font-size:11px;color:${RUST};letter-spacing:2px;font-weight:600;transition:all .2s}
+.bio-link:hover{background:${RUST};color:${CREAM}}
+
+/* TRACKLIST */
+.tl{border:2px solid ${CREAM}0c}
+.tl-row{display:grid;grid-template-columns:42px 1fr auto;align-items:center;padding:11px 18px;gap:10px;position:relative;overflow:hidden;border-bottom:1px solid ${CREAM}06;transition:all .2s;cursor:default}
+.tl-hi{background:${CREAM}05}
+.tl-n{font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;color:${TEAL};text-align:right}
+.tl-t{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;color:${TITLE_WHITE};letter-spacing:1px;display:block}
+.tl-f{font-size:10px;color:${CREAM}44;display:block;margin-top:1px}
+.tl-nt{font-size:9px;color:${RUST};display:block;margin-top:1px}
+.tl-tm{font-size:10px;color:${CREAM}28;font-variant-numeric:tabular-nums}
+.tl-bar{position:absolute;bottom:0;left:0;height:2px;transition:width .4s ease}
+.tl-cred{font-family:'Oswald',sans-serif;font-size:13px;color:${RUST};text-align:center;margin-top:20px;letter-spacing:2px}
+.tl-copy{font-size:9px;color:${CREAM}28;text-align:center;margin-top:4px;letter-spacing:1px}
+
+/* LISTEN */
+.sc-wrap{border:2px solid ${TEAL}55;padding:3px;background:${BLACK};margin-bottom:22px}
+.sc-cta{border:2px solid ${CREAM}0c;padding:28px;text-align:center;position:relative;overflow:hidden}
+.cta-bg{position:absolute;inset:0;width:100%;height:100%}
+.sc-h{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:${TITLE_WHITE};letter-spacing:3px;margin-bottom:6px;position:relative}
+.sc-p{font-size:10px;color:${CREAM}66;line-height:1.8;position:relative}
+
+/* PILLS */
+.pill-hd{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;color:${CREAM}33;letter-spacing:3px;text-align:center;margin-bottom:10px}
+.pills{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.pill{padding:6px 12px;border:1px solid ${TEAL}44;color:${TEAL};text-decoration:none;font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;transition:all .15s}
+.pill:hover{background:${TEAL};color:${BLACK}}
+
+/* SHOP */
+.shop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.shop-card{border:2px solid ${CREAM}0c;text-align:center;transition:all .25s;background:${BLACK};overflow:hidden}
+.shop-card:hover{border-color:${TEAL};transform:translateY(-2px)}
+.shop-top{padding:18px;display:flex;align-items:center;justify-content:center}
+.shop-top-t{background:${TEAL}0c}.shop-top-r{background:${RUST}0c}
+.shop-icon{font-size:32px}
+.shop-name{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;color:${TITLE_WHITE};margin:12px 0 4px}
+.shop-desc{font-size:8px;color:${CREAM}44;letter-spacing:1px;line-height:1.6;margin:0 14px 14px}
+.shop-btn{display:inline-block;padding:7px 20px;text-decoration:none;font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;transition:all .2s;color:${CREAM};margin-bottom:16px}
+.shop-btn-t{background:${TEAL}}.shop-btn-t:hover{background:${CREAM};color:${TEAL}}
+.shop-btn-r{background:${RUST}}.shop-btn-r:hover{background:${CREAM};color:${RUST}}
+
+/* MERCH */
+.merch-sec{margin-top:40px}
+.merch-box{border:2px solid ${RUST}33;position:relative;overflow:hidden}
+.merch-bg{position:absolute;inset:0;width:100%;height:100%}
+.merch-inner{display:flex;gap:26px;align-items:center;padding:24px;position:relative;z-index:1}
+.merch-tee{width:120px;height:140px;background:${BLACK};border:2px solid ${CREAM}14;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.tee-t{font-family:'Oswald',sans-serif;font-size:11px;font-weight:700;color:${TITLE_WHITE};letter-spacing:1px}
+.tee-s{font-size:8px;color:${TEAL};letter-spacing:2px}
+.merch-h{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;color:${TITLE_WHITE};letter-spacing:2px;margin-bottom:6px}
+.merch-p{font-size:10px;color:${CREAM}66;line-height:1.9;margin-bottom:14px}
+
+/* FOOTER */
+.ftr{margin-top:44px;text-align:center}
+.ftr-inner{padding:24px 20px}
+.ftr-title{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;color:${TITLE_WHITE};letter-spacing:5px}
+.ftr-d1{color:${RUST}}.ftr-d2{color:${TEAL}}
+.ftr-sub{font-size:9px;color:${CREAM}33;margin-top:5px;letter-spacing:1px}
+.ftr-url{font-size:9px;color:${CREAM}1a;margin-top:3px;letter-spacing:1px}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:${BLACK}}
+::-webkit-scrollbar-thumb{background:${TEAL}33}
+
+@media(max-width:700px){
+  .hdr-tab{padding:5px 7px;font-size:9px;letter-spacing:1px}
+  .hdr-h{font-size:14px;letter-spacing:2px}
+  .hero-inner{grid-template-columns:1fr!important;text-align:center}
+  .hero-cover-col{max-width:300px;margin:0 auto}
+  .hero-dash{margin:0 auto 16px}
+  .hero-body{margin:0 auto 20px}
+  .hero-btns{justify-content:center}
+  .hero-stats{justify-content:center}
+  .deco{display:none}
+  .art-grid{grid-template-columns:1fr!important}
+  .shop-grid{grid-template-columns:1fr 1fr!important}
+  .merch-inner{flex-direction:column!important;text-align:center}
+}
+      `}</style>
+      <Header tab={tab} setTab={go}/>
+      <main key={tab}>
+        {tab==="home" && <Home setTab={go}/>}
+        {tab==="artists" && <Artists/>}
+        {tab==="tracklist" && <TracklistPage/>}
+        {tab==="listen" && <ListenPage setTab={go}/>}
+        {tab==="shop" && <ShopPage/>}
+      </main>
+      <Footer/>
+    </div>
+  );
+}
